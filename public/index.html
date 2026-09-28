@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UNO With Friends &amp; Bots | Play Online Free</title>
+  
+  <meta name="description" content="Play UNO online with friends and smart AI bots! Create a private room, share your room code, choose UNO No Mercy, Classic, or Cyber Chaos, and customize turn timers.">
+  <meta name="theme-color" content="#0b0f19">
+
+  <!-- Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/cards.css">
+  <link rel="stylesheet" href="/css/animations.css">
+</head>
+<body>
+
+  <!-- Ambient Particle Canvas -->
+  <canvas id="background-canvas"></canvas>
+
+  <!-- Physics Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div id="app">
+    <!-- Top Global Header -->
+    <header class="game-header">
+      <div class="logo-badge" id="logo-home-btn" title="Back to Home">
+        <div class="logo-icon-card">UNO</div>
+        <span>UNO MULTIPLAYER</span>
+        <span class="badge-pill">FRIENDS &amp; BOTS</span>
+      </div>
+
+      <div class="header-controls">
+        <button class="btn-icon" id="btn-rules" title="Game Rules &amp; Modifiers">📜</button>
+        <button class="btn-icon" id="btn-mute" title="Toggle Sound">🔊</button>
+      </div>
+    </header>
+
+    <!-- ======================================================== -->
+    <!-- 1. LANDING SCREEN (Play with Friends & Bots)             -->
+    <!-- ======================================================== -->
+    <main class="screen lobby-screen active" id="lobby-screen">
+      <div class="main-setup-card">
+        <div class="setup-hero">
+          <h1>PLAY WITH FRIENDS &amp; BOTS</h1>
+          <p>Host a private room, invite your friends with a link, and add AI bots to fill empty seats!</p>
+        </div>
+
+        <!-- Avatar Selection -->
+        <div class="form-section">
+          <label class="section-label">Choose Your Avatar</label>
+          <div class="avatar-picker-grid" id="avatar-picker">
+            <div class="avatar-choice" data-avatar="😎">😎</div>
+            <div class="avatar-choice selected" data-avatar="🤠">🤠</div>
+            <div class="avatar-choice" data-avatar="🐱">🐱</div>
+            <div class="avatar-choice" data-avatar="🤖">🤖</div>
+            <div class="avatar-choice" data-avatar="🦊">🦊</div>
+            <div class="avatar-choice" data-avatar="🦁">🦁</div>
+            <div class="avatar-choice" data-avatar="🐯">🐯</div>
+            <div class="avatar-choice" data-avatar="🚀">🚀</div>
+          </div>
+        </div>
+
+        <!-- Player Nickname -->
+        <div class="form-section">
+          <label class="section-label">👤 Player Nickname</label>
+          <input type="text" class="form-input" id="player-name-input" value="Player 1" maxlength="15" placeholder="Enter your player nickname...">
+        </div>
+
+        <!-- Big Neobrutalist Action Buttons -->
+        <div class="landing-buttons-col">
+          <button class="btn-brutal btn-host-game" id="btn-open-host-modal">
+            🎮 CREATE ROOM (PLAY WITH FRIENDS &amp; BOTS)
+          </button>
+          <button class="btn-brutal btn-join-game" id="btn-open-join-modal">
+            🔑 JOIN ROOM WITH CODE
+          </button>
+        </div>
+
+        <!-- Features Strip -->
+        <div class="features-strip">
+          <span class="feature-tag highlight">💀 UNO No Mercy</span>
+          <span class="feature-tag">⏱️ 15s–60s Timing</span>
+          <span class="feature-tag">🤖 Smart AI Bots</span>
+          <span class="feature-tag">⚡ Multi-Device Rooms</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- 2. ROOM LOBBY / WAITING SCREEN                           -->
+    <!-- ======================================================== -->
+    <main class="screen room-lobby-screen" id="room-lobby-screen">
+      <div class="room-dashboard-card">
+        <!-- Room Code & Actions Header -->
+        <div class="room-header-top">
+          <div class="room-code-badge-group">
+            <span class="room-code-label">Room Code:</span>
+            <span class="room-code-display" id="room-code-display">------</span>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn-copy-code" id="btn-copy-link" title="Copy Invite Link">
+              📋 Copy Invite Link
+            </button>
+            <button class="btn-lobby-back" id="btn-lobby-leave" title="Leave Room">
+              🚪 Leave
+            </button>
+          </div>
+        </div>
+
+        <!-- Timing & What You Play Summary -->
+        <div class="room-meta-bar">
+          <div class="meta-pill mode" id="meta-mode-display">
+            🎮 Mode: UNO No Mercy
+          </div>
+          <div class="meta-pill timing" id="meta-timing-display">
+            ⏱️ Turn Timer: 30 Seconds
+          </div>
+          <div class="meta-pill players" id="meta-players-count">
+            👥 1 / 6 Players
+          </div>
+        </div>
+
+        <!-- Live 6-Seat Visual Pods Grid -->
+        <div class="form-section">
+          <div class="room-header-top" style="border:none; padding:0; margin-bottom:4px;">
+            <label class="section-label">👥 6-Player Room Table</label>
+            <span style="font-size:13px; font-weight:800; color:var(--muted-text);" id="room-seats-info">Seats Available: 5</span>
+          </div>
+
+          <div class="room-seats-grid" id="room-seats-grid">
+            <!-- Dynamically populated with 6 visual pods via app.js -->
+          </div>
+        </div>
+
+        <!-- Room Action Controls (Add Bot & Start Game) -->
+        <div class="room-actions-bar">
+          <button class="btn-brutal btn-add-bot" id="btn-room-add-bot">
+            🤖 + Add AI Bot
+          </button>
+          <button class="btn-brutal btn-start-game" id="btn-room-start-game">
+            🚀 Start Game
+          </button>
+        </div>
+
+        <div style="font-size:13px; font-weight:700; color:var(--muted-text); text-align:center;" id="room-host-notice">
+          Invite friends with the room link above or click "+ Add AI Bot" to fill seats. When ready, click Start Game!
+        </div>
+      </div>
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- 3. IN-GAME ARENA                                         -->
+    <!-- ======================================================== -->
+    <main class="screen game-screen" id="game-screen">
+      <div class="arena-container" id="game-arena">
+        <!-- Opponents Arc -->
+        <div class="opponents-container" id="opponents-container"></div>
+
+        <!-- Ambient Color Lamp Glow -->
+        <div class="table-color-aura" id="table-color-aura"></div>
+
+        <!-- Rotating Direction Ring -->
+        <div class="direction-indicator clockwise" id="direction-ring"></div>
+
+        <!-- In-Game Turn Status Banner -->
+        <div class="game-turn-banner" id="game-turn-banner">
+          <span class="turn-pulse-dot"></span>
+          <span id="turn-banner-text">Waiting for game to start...</span>
+        </div>
+
+        <!-- Center Discard & Draw Table -->
+        <div class="table-center">
+          <div class="deck-slot" id="deck-pile" title="Click to Draw Card (or press Space)"></div>
+          <div class="discard-slot" id="discard-pile"></div>
+          <div class="stack-badge" id="stack-badge">+2 STACK</div>
+        </div>
+
+        <div class="table-alert" id="table-alert"></div>
+        <button class="jump-in-btn" id="jump-in-btn">⚡ JUMP-IN!</button>
+
+        <!-- Live In-Game Game Feed & Chat Messages Panel -->
+        <div class="game-messages-panel" id="game-messages-panel">
+          <div class="messages-panel-header">
+            <span class="panel-title">💬 Game Feed &amp; Chat</span>
+            <button class="btn-toggle-messages" id="btn-toggle-messages" title="Minimize / Expand">➖</button>
+          </div>
+          <div class="messages-content-list" id="messages-content-list">
+            <div class="feed-msg action">🎮 Match in progress. Enjoy the game!</div>
+          </div>
+          <div class="quick-phrases-bar">
+            <span class="phrase-chip" data-phrase="Good move! 👍">👍 Good move!</span>
+            <span class="phrase-chip" data-phrase="No Mercy! 💀">💀 No Mercy!</span>
+            <span class="phrase-chip" data-phrase="Take that! 🔥">🔥 Take that!</span>
+            <span class="phrase-chip" data-phrase="GG! 🎉">🎉 GG!</span>
+          </div>
+          <div class="messages-input-bar">
+            <input type="text" class="msg-input" id="in-game-chat-input" placeholder="Type message..." maxlength="60">
+            <button class="btn-send-msg" id="btn-send-in-game-chat">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Hand Bottom Area -->
+      <div class="player-bottom-bar">
+        <div class="player-action-controls">
+          <div class="local-mercy-gauge" id="local-mercy-gauge">7 / 25 CARDS</div>
+          <button class="btn-uno-shout" id="btn-uno-shout" title="Shout UNO! (Key: U)">
+            📢 UNO!
+          </button>
+          <button class="btn-uno-catch" id="btn-uno-catch" title="Catch opponent who forgot to call UNO">
+            🚨 CATCH
+          </button>
+
+          <!-- Quick In-Game Reaction Emotes -->
+          <div class="in-game-emotes">
+            <button class="emote-btn" data-emote="🔥" title="Fire">🔥</button>
+            <button class="emote-btn" data-emote="💀" title="Skull">💀</button>
+            <button class="emote-btn" data-emote="😂" title="Laugh">😂</button>
+            <button class="emote-btn" data-emote="😭" title="Cry">😭</button>
+            <button class="emote-btn" data-emote="😱" title="Shock">😱</button>
+            <button class="emote-btn" data-emote="👏" title="Clap">👏</button>
+          </div>
+        </div>
+
+        <div class="player-hand" id="player-hand"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODALS                                                   -->
+  <!-- ======================================================== -->
+
+  <!-- 1. HOST GAME MODAL: WHAT YOU PLAY & TURN TIMING -->
+  <div class="modal-overlay" id="host-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🎮 Create Private Room</h3>
+        <button class="modal-close" id="btn-close-host-modal">&times;</button>
+      </div>
+
+      <!-- What You Play (Game Mode Selector) -->
+      <div class="form-section">
+        <label class="section-label">🎮 What You Play (Game Mode)</label>
+        <div class="mode-selector-grid">
+          <!-- Mode 1: UNO No Mercy -->
+          <div class="mode-pill mercy selected" data-mode="mercy">
+            <div class="mode-pill-header">
+              <span>💀 UNO No Mercy</span>
+              <span class="seat-badge host" style="background:#fee2e2; color:#cc3333; font-size:10px;">FEATURED</span>
+            </div>
+            <div class="mode-pill-desc">25-card elimination, +6 &amp; +10 nukes, Discard All, Skip Everyone.</div>
+          </div>
+
+          <!-- Mode 2: Classic UNO -->
+          <div class="mode-pill" data-mode="classic">
+            <div class="mode-pill-header">
+              <span>🃏 Classic UNO</span>
+              <span class="seat-badge" style="background:#f1f5f9; color:#475569; font-size:10px;">OFFICIAL</span>
+            </div>
+            <div class="mode-pill-desc">Standard 108 cards, Skips, Reverses, +2, and Wild +4.</div>
+          </div>
+
+          <!-- Mode 3: Cyber Chaos -->
+          <div class="mode-pill" data-mode="chaos">
+            <div class="mode-pill-header">
+              <span>⚡ Cyber Chaos</span>
+              <span class="seat-badge bot" style="background:#eff6ff; color:#0956bf; font-size:10px;">CHAOS</span>
+            </div>
+            <div class="mode-pill-desc">Shield Deflect cards, Mystery Glitch roulette, and Jump-Ins.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Turn Timing Selector -->
+      <div class="form-section">
+        <label class="section-label">⏱️ Turn Timing</label>
+        <div class="timer-selector-grid">
+          <div class="timer-pill" data-time="15">⚡ 15s (Fast)</div>
+          <div class="timer-pill selected" data-time="30">⏱️ 30s (Default)</div>
+          <div class="timer-pill" data-time="45">☕ 45s (Casual)</div>
+          <div class="timer-pill" data-time="60">🐢 60s (Slow)</div>
+        </div>
+      </div>
+
+      <!-- Create Room Button -->
+      <button class="btn-brutal btn-host-game" id="btn-create-room" style="margin-top:6px;">
+        🚀 Create Room Now
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. JOIN GAME MODAL -->
+  <div class="modal-overlay" id="join-modal">
+    <div class="modal-card" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 Join Room</h3>
+        <button class="modal-close" id="btn-close-join-modal">&times;</button>
+      </div>
+
+      <div class="form-section">
+        <label class="section-label">Enter 6-Letter Room Code</label>
+        <input type="text" class="form-input" id="join-code-input" placeholder="ROOM CODE" maxlength="6" style="text-transform:uppercase; font-family:var(--font-mono); letter-spacing:4px; text-align:center; font-size:22px; font-weight:900;">
+      </div>
+
+      <button class="btn-brutal btn-join-game" id="btn-join-room" style="margin-top:6px;">
+        🚀 Enter Room
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. Rules Modal -->
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">📜 Game Rules &amp; Chaos Toggles</h3>
+        <button class="modal-close" id="btn-close-rules">&times;</button>
+      </div>
+
+      <div class="rules-grid">
+        <div class="rule-item">
+          <div class="rule-info">
+            <div class="rule-name" style="color:#cc3333;">25-Card Mercy Elimination <span class="seat-badge host" style="background:#fee2e2; color:#cc3333;">NO MERCY</span></div>
+            <div class="rule-desc">Holding 25 or more cards results in instant knockout and elimination!</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="rule-mercy" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-info">
+            <div class="rule-name">Draw Card Stacking (+2, +4, +6, +10) <span class="seat-badge host" style="background:#fee2e2; color:#cc3333;">NO MERCY</span></div>
+            <div class="rule-desc">Stack equal or higher draw penalties until someone absorbs the entire load!</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="rule-stacking" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-info">
+            <div class="rule-name">7 &amp; 0 Hand Swaps <span class="seat-badge bot" style="background:#eff6ff; color:#0956bf;">STRATEGY</span></div>
+            <div class="rule-desc">7 lets you swap hands with any opponent; 0 rotates all hands around the table.</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="rule-sevenzero" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-info">
+            <div class="rule-name">Jump-In Rule <span class="seat-badge" style="background:#fef9c3; color:#854d0e;">EXTRA</span></div>
+            <div class="rule-desc">Holding an exact color &amp; value match lets you jump in out of turn!</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="rule-jumpin" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Radial Wild Color Wheel Modal -->
+  <div class="modal-overlay" id="color-picker-modal">
+    <div class="modal-card" style="max-width:360px; text-align:center;">
+      <h3 class="modal-title" style="justify-content:center; margin-bottom:4px;">Choose Active Color</h3>
+      <p style="font-size:13px; color:var(--muted-text); margin-bottom:8px; font-weight:700;">Select the color for your Wild card:</p>
+      <div class="radial-color-wheel">
+        <div class="radial-color-sector red" data-color="red">RED</div>
+        <div class="radial-color-sector blue" data-color="blue">BLUE</div>
+        <div class="radial-color-sector yellow" data-color="yellow">YELLOW</div>
+        <div class="radial-color-sector green" data-color="green">GREEN</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 7 Hand Swap Target Selector Modal -->
+  <div class="modal-overlay" id="swap-modal">
+    <div class="modal-card" style="max-width:440px;">
+      <h3 class="modal-title" style="margin-bottom:6px;">🔄 Choose Swap Target</h3>
+      <p style="font-size:13px; color:var(--muted-text); margin-bottom:12px; font-weight:700;">You played a 7! Select an opponent to swap hands with:</p>
+      <div id="swap-targets-list" class="swap-targets-grid"></div>
+    </div>
+  </div>
+
+  <!-- 6. Winner Celebration Modal -->
+  <div class="modal-overlay" id="winner-modal">
+    <div class="modal-card winner-card" style="max-width:440px;">
+      <div class="winner-trophy">🏆</div>
+      <h2 class="winner-title" id="winner-name">VICTORY!</h2>
+      <p style="color:var(--muted-text); font-size:16px; font-weight:700;">Outstanding play! You dominated the table!</p>
+      <button class="btn-brutal btn-host-game" id="btn-return-lobby" style="margin-top:10px; font-size:16px; padding:14px 36px;">
+        Return to Lobby
+      </button>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="/js/audio.js"></script>
+  <script src="/js/cards.js"></script>
+  <script src="/js/particles.js"></script>
+  <script src="/js/ai.js"></script>
+  <script src="/js/engine.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/network.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
