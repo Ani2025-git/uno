@@ -1,21 +1,23 @@
 {
   "name": "uno-game",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "UNO No Mercy Party Game with Friends and Bots",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "echo \"Build complete\""
   },
-  "keywords": [],
+  "keywords": [
+    "uno",
+    "game",
+    "multiplayer",
+    "bots"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "express": "^5.2.1",
     "ws": "^8.22.0"
-  },
-  "devDependencies": {
-    "vercel": "^60.1.3"
   }
 }

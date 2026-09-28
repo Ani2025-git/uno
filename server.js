@@ -333,9 +333,14 @@ function broadcastToRoom(roomId, messageObj) {
   });
 }
 
-server.listen(PORT, () => {
-  console.log(`\n=================================================`);
-  console.log(`🚀 UNO With Friends & Bots running at http://localhost:${PORT}`);
-  console.log(`⚡ Real-Time Rooms with Bot Support`);
-  console.log(`=================================================\n`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`\n=================================================`);
+    console.log(`🚀 UNO With Friends & Bots running at http://localhost:${PORT}`);
+    console.log(`⚡ Real-Time Rooms with Bot Support`);
+    console.log(`=================================================\n`);
+  });
+}
+
+module.exports = app;
+
